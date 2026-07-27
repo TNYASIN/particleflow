@@ -82,6 +82,7 @@ CLASS_LABELS = {
     "cms": CLASS_LABELS_CMS,
     "clic": CLASS_LABELS_CLIC,
     "cld": CLASS_LABELS_CLIC,
+    "muoncollider": CLASS_LABELS_CLIC,
 }
 
 labels = {
@@ -115,7 +116,9 @@ def get_class_names(sample_name):
         return CLASS_NAMES_CLIC
     elif sample_name.startswith("cms_"):
         return CLASS_NAMES_CMS
-    if sample_name.startswith("cld_"):
+    elif sample_name.startswith("cld_"):
+        return CLASS_NAMES_CLIC
+    elif sample_name.startswith("muoncollider_"):
         return CLASS_NAMES_CLIC
     else:
         raise Exception("Unknown sample name: {}".format(sample_name))
@@ -138,12 +141,14 @@ EVALUATION_DATASET_NAMES = {
     "cms_pf_ztt_nopu": r"$\mathrm{Z}\rightarrow \mathrm{\tau}\mathrm{\tau}$, no pileup",
     "cms_pf_photonjet": r"$\gamma$ + jets, pileup 55-75",
     "cms_pf_photonjet_nopu": r"$\gamma$ + jets, no pileup",
+    "muoncollider_ttbar_pf": r"$\mu^+\mu^- \rightarrow \mathrm{t}\bar{\mathrm{t}}$",
 }
 
 GENJET_BINS_PT_DATASET = {
     "clic": [10, 20, 40, 60, 80, 100, 200],
     "cld": [10, 20, 40, 60, 80, 100, 200],
     "cms": [10, 20, 40, 60, 80, 100, 200, 400, 800],
+    "muoncollider": [10, 20, 40, 60, 80, 100, 200],
 }
 
 SAMPLE_NAME_TO_PROCESS = {
@@ -287,10 +292,15 @@ def cld_label(ax):
     return experiment_label(ax, experiment="Key4HEP-CLD", tag1="Sim.", tag2="ee (365 GeV)", x1=0.35)
 
 
+def muoncollider_label(ax):
+    return experiment_label(ax, experiment="Muon Collider", tag1="Sim.", tag2="μμ (10 TeV)", x1=0.35)
+
+
 EXPERIMENT_LABELS = {
     "cms": cms_label,
     "clic": clic_label,
     "cld": cld_label,
+    "muoncollider": muoncollider_label,
 }
 
 

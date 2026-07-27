@@ -13,22 +13,15 @@ import tqdm
 import vector
 from mlpf.jet_utils import match_two_jet_collections
 from mlpf.plotting.plot_utils import (
-    # get_class_names,
-    # compute_met_and_ratio,
+    get_class_names,
+    compute_met_and_ratio,
     load_eval_data,
     plot_jets,
     plot_jet_ratio,
-    # plot_jet_response_binned,
-    # plot_jet_response_binned_vstarget,
-    # plot_jet_response_binned_eta,
-    # plot_met,
-    # plot_met_ratio,
-    # plot_met_response_binned,
     plot_num_elements,
-    # plot_particles,
-    # plot_particle_ratio,
-    # plot_particle_response,
-    # plot_pu_fraction,
+    plot_particles,
+    plot_particle_ratio,
+    plot_particle_response,
 )
 
 from mlpf.logger import _logger
@@ -196,7 +189,7 @@ def make_plots(outpath, sample, dataset, dir_name="", ntest_files=-1):
     plot_num_elements(X, cp_dir=plots_path)
     _logger.info("Plotted number of elements")
 
-    # plot_elements(X, yvals, cp_dir=plots_path, dataset=dataset, sample=sample)
+    class_names = get_class_names(sample)
 
     plot_jets(
         yvals,
@@ -275,14 +268,12 @@ def make_plots(outpath, sample, dataset, dir_name="", ntest_files=-1):
     # plot_met_response_binned(met_data, cp_dir=plots_path, dataset=dataset, sample=sample)
     # _logger.info("Plotted binned MET response")
 
-    # plot_particles(yvals, cp_dir=plots_path, dataset=dataset, sample=sample)
-    # _logger.info("Plotted particles")
-    # plot_particle_ratio(yvals, class_names, cp_dir=plots_path, dataset=dataset, sample=sample)
-    # _logger.info("Plotted particle ratio")
-    # plot_particle_response(X, yvals, class_names, cp_dir=plots_path, dataset=dataset, sample=sample)
-    # _logger.info("Plotted particle response")
-    # plot_pu_fraction(yvals, cp_dir=plots_path, dataset=dataset, sample=sample)
-    # _logger.info("Plotted PU fraction")
+    plot_particles(yvals, cp_dir=plots_path, dataset=dataset, sample=sample)
+    _logger.info("Plotted particles")
+    plot_particle_ratio(yvals, class_names, cp_dir=plots_path, dataset=dataset, sample=sample)
+    _logger.info("Plotted particle ratio")
+    plot_particle_response(X, yvals, class_names, cp_dir=plots_path, dataset=dataset, sample=sample)
+    _logger.info("Plotted particle response")
 
     del X, yvals
     plt.close("all")
