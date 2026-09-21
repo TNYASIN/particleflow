@@ -1,7 +1,8 @@
+## Smoke test pod for attention mechanism - figuring out batch size
 apiVersion: v1
 kind: Pod
 metadata:
-  name: train-muoncollider-attention-100k
+  name: smoke-test-attention
   namespace: muoncollider-ml
 spec:
   restartPolicy: Never
@@ -17,24 +18,24 @@ spec:
           pip install -q tensorflow==2.14.0 "tensorflow-datasets==4.9.3" "tensorflow-metadata==1.14.0" "protobuf>=3.20.3,<5.0.0" awkward pyarrow fastjet mplhep && \
           pip install -q -r /data/users/tanya/particleflow/requirements.txt && \
           export PYTHONPATH=/data/users/tanya/particleflow && \
-          mkdir -p /data/users/tanya/runs/attention-100k && \
+          mkdir -p /data/users/tanya/runs/smoke-test && \
           python /data/users/tanya/particleflow/mlpf/pipeline.py \
             --config /data/users/tanya/particleflow/parameters/pytorch/pyg-muoncollider.yaml \
             --data-dir /data/users/tanya/tfds \
-            --experiment-dir /data/users/tanya/runs/attention-100k \
+            --experiment-dir /data/users/tanya/runs/smoke-test \
             train \
             --gpus 1 \
             --conv-type attention \
-            --make-plots --test-datasets muoncollider_ttbar_pf
-        ##  --load-checkpoint /data/users/tanya/runs/attention-100k/checkpoints/last.ckpt
+            --gpu-batch-multiplier 15 \
+            --num-steps 300
       resources:
         requests:
-          cpu: "4"
-          memory: "16Gi"
+          cpu: "1"
+          memory: "4Gi"
           nvidia.com/gpu: "1"
         limits:
-          cpu: "8"
-          memory: "32Gi"
+          cpu: "2"
+          memory: "8Gi"
           nvidia.com/gpu: "1"
       volumeMounts:
         - name: data

@@ -600,7 +600,7 @@ def train_all_steps(
             valid_loader,
             train_sampler,
             valid_sampler,
-            config["patience"],
+            config.get("keep_n_checkpoints", config["patience"]),
         )
 
         # Run validation, testing, and plotting cycle at specified frequency, or at the last step
@@ -698,6 +698,11 @@ def run_test(rank, world_size, config, outdir, model, sample, testdir_name, dtyp
 
     # FIXME: import this from a central place
     if config["dataset"] == "clic":
+        import fastjet
+
+        jetdef = fastjet.JetDefinition(fastjet.ee_genkt_algorithm, 0.4, -1.0)
+        jet_ptcut = 5
+    elif config["dataset"] == "muoncollider":
         import fastjet
 
         jetdef = fastjet.JetDefinition(fastjet.ee_genkt_algorithm, 0.4, -1.0)

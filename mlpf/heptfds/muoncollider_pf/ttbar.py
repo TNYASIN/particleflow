@@ -24,9 +24,11 @@ FIXME
 
 
 class MuoncolliderTtbarPf(tfds.core.GeneratorBasedBuilder):
-    VERSION = tfds.core.Version("1.0.0")
+    VERSION = tfds.core.Version("1.2.0")
     RELEASE_NOTES = {
         "1.0.0": "Initial release",
+        "1.1.0": "change in target defn",
+        "1.2.0": "100k events ",
     }
     MANUAL_DOWNLOAD_INSTRUCTIONS = """
     Place the muon collider parquet files in the manual_dir (e.g. /data/dataset).

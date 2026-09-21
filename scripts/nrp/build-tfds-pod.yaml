@@ -14,8 +14,7 @@ spec:
           pip install -q awkward pyarrow "tensorflow-datasets==4.9.3" "tensorflow-metadata==1.14.0" "protobuf>=3.20.3,<5.0.0" && \
           python /data/users/tanya/particleflow/scripts/nrp/build_tfds.py \
             /data/users/tanya/tfds \
-            /data/ttbar_reco \
-            /data/muoncollider_all
+            /data/ttbar_reco-v06-split
       resources:
         requests:
           cpu: "4"

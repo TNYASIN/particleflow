@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: upload-pvc
+  namespace: muoncollider-ml
+spec:
+  restartPolicy: Never
+  containers:
+    - name: uploader
+      image: busybox
+      command: ["sleep", "3600"]
+      resources:
+        requests:
+          cpu: "1"
+          memory: "1Gi"
+        limits:
+          cpu: "2"
+          memory: "2Gi"
+      volumeMounts:
+        - name: data
+          mountPath: /data
+  volumes:
+    - name: data
+      persistentVolumeClaim:
+        claimName: muon-project-data
