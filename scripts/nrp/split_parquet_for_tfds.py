@@ -18,9 +18,9 @@ import pyarrow.parquet as pq
 import awkward as ak
 import os
 
-infile = '/Users/tanya/Downloads/ttbar_reco.parquet'
-outdir = '/Users/tanya/Downloads/ttbar_reco-v06-merged'
-rows_per_file = 10   # merges 10 original rows (10*10=100 events) into 1 output row/file
+infile = '/Users/tanya/Downloads/ttbar_reco.9600events.parquet'
+outdir = '/Users/tanya/Downloads/ttbar_reco-9600-merged'
+rows_per_file = 1   # 961 files
 os.makedirs(outdir, exist_ok=True)
 
 print('Loading', infile)

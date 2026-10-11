@@ -9,7 +9,7 @@ gpus: 1
 gpu_batch_multiplier: 12
 load:
 finetune:
-num_steps: 300000 
+num_steps: 36000  # ~50 epochs for 9600 events
 patience: 15
 optimizer: adamw
 lr: 0.0001
@@ -26,7 +26,7 @@ comet_name: particleflow-pt-muoncollider
 comet_offline: False
 comet_step_freq: 100
 dtype: bfloat16
-val_freq: 3750
+val_freq: 700  # ~1 epoch for 9600 events
 
 model:
   trainable: all
@@ -95,7 +95,7 @@ train_dataset:
       batch_size: 1
       samples:
         muoncollider_ttbar_pf:
-          version: 1.2.0
+          version: 1.3.0
           splits: [1,2,3,4,5,6,7,8,9,10]
 
 valid_dataset:
@@ -104,11 +104,11 @@ valid_dataset:
       batch_size: 1
       samples:
         muoncollider_ttbar_pf:
-          version: 1.2.0
+          version: 1.3.0
           splits: [1,2,3,4,5,6,7,8,9,10]
 
 test_dataset:
   muoncollider_ttbar_pf:
     batch_size: 1
-    version: 1.2.0
+    version: 1.3.0
     splits: [1,2,3,4,5,6,7,8,9,10]

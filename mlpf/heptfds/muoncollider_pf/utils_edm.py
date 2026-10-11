@@ -12,7 +12,7 @@ X_FEATURES_CL = [
     "elemtype", "et", "eta", "sin_phi", "cos_phi", "energy",
     "position.x", "position.y", "position.z", "iTheta",
     "energy_ecal", "energy_hcal", "energy_other", "num_hits",
-    "sigma_x", "sigma_y", "sigma_z",
+    "sigma_x", "sigma_y", "sigma_z", "num_muon_hits", "energy_muon",
 ]
 Y_FEATURES = [
     "PDG", "charge", "pt", "eta", "sin_phi", "cos_phi", "energy",
@@ -76,7 +76,7 @@ def _prepare_event(ret, iev, has_ycand):
     ret["X_track"] is already the event array — no outer [0] needed.
     """
     X1 = _arr(ret["X_track"][iev]).reshape(-1, 16)    # (n_tracks, 16)
-    X2 = _arr(ret["X_cluster"][iev]).reshape(-1, 17)  # (n_clusters, 17)
+    X2 = _arr(ret["X_cluster"][iev]).reshape(-1, 19)  # (n_clusters, 19)
 
     if X1.shape[0] == 0:
         X1 = np.zeros((0, N_X_FEATURES), dtype=np.float32)

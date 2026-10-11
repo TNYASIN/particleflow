@@ -163,6 +163,8 @@ X_FEATURES = {
         "Z0 | sigma_x",
         "time | sigma_y",
         "Null | sigma_z",
+        "Null | num_muon_hits",
+        "Null | energy_muon",
     ],
 }
 
