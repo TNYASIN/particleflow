@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: train-muoncollider-attention-9600
+  name: train-muoncollider-attention-9600-clsweight
   namespace: muoncollider-ml
 spec:
   restartPolicy: Never
@@ -17,16 +17,16 @@ spec:
           pip install -q tensorflow==2.14.0 "tensorflow-datasets==4.9.3" "tensorflow-metadata==1.14.0" "protobuf>=3.20.3,<5.0.0" awkward pyarrow fastjet mplhep && \
           pip install -q -r /data/users/tanya/particleflow/requirements.txt && \
           export PYTHONPATH=/data/users/tanya/particleflow && \
-          mkdir -p /data/users/tanya/runs/attention-9600 && \
+          mkdir -p /data/users/tanya/runs/attention-9600-clsweight && \
           python /data/users/tanya/particleflow/mlpf/pipeline.py \
             --config /data/users/tanya/particleflow/parameters/pytorch/pyg-muoncollider.yaml \
             --data-dir /data/users/tanya/tfds \
-            --experiment-dir /data/users/tanya/runs/attention-9600 \
+            --experiment-dir /data/users/tanya/runs/attention-9600-clsweight \
             train \
             --gpus 1 \
             --conv-type attention \
             --make-plots --test-datasets muoncollider_ttbar_pf
-        ##  --load-checkpoint /data/users/tanya/runs/attention-9600/checkpoints/last.ckpt
+        ##  --load /data/users/tanya/runs/attention-9600-clsweight/checkpoints/checkpoint-<step>.pth
       resources:
         requests:
           cpu: "4"

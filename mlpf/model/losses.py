@@ -31,7 +31,8 @@ def mlpf_loss(y, ypred, batch):
         batch [PFBatch]: the MLPF inputs
     """
     loss = {}
-    loss_obj_id = FocalLoss(gamma=2.0, reduction="none")
+    loss_obj_id = FocalLoss(alpha=torch.tensor([1.0, 1.0, 1.0, 1.0, 100.0, 100.0], device=y["cls_id"].device), gamma=2.0, reduction="none")
+
 
     # msk_pred_particle = torch.unsqueeze((ypred["cls_id"] != 0).to(dtype=torch.float32), dim=-1)
     msk_true_particle = torch.unsqueeze((y["cls_id"] != 0).to(dtype=torch.float32), dim=-1)
