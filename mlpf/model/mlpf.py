@@ -110,10 +110,16 @@ class SimpleMultiheadAttention(nn.MultiheadAttention):
             k = k.reshape(bs, seq_len, num_heads, head_dim).transpose(1, 2).reshape(bs * num_heads, seq_len, head_dim)
             v = v.reshape(bs, seq_len, num_heads, head_dim).transpose(1, 2).reshape(bs * num_heads, seq_len, head_dim)
 
+        # key_padding_mask: [bs, seq_len], True where elements are to be ignored
+        # scaled_dot_product_attention expects attn_mask: [bs*num_heads, 1, seq_len], False where elements are to be ignored
+        attn_mask = None
+        if key_padding_mask is not None and not self.export_onnx_fused:
+            attn_mask = ~key_padding_mask.repeat_interleave(num_heads, dim=0).unsqueeze(1)
+
         # this function will have different shape signatures in native pytorch sdpa and in ONNX com.microsoft.MultiHeadAttention
         # in pytorch: (bs*num_heads, seq_len, head_dim)
         # in ONNX: (bs, seq_len, num_heads*head_dim)
-        attn_output = torch.nn.functional.scaled_dot_product_attention(q, k, v, dropout_p=self.dropout)
+        attn_output = torch.nn.functional.scaled_dot_product_attention(q, k, v, attn_mask=attn_mask, dropout_p=self.dropout)
 
         # in case running with pytorch internal scaled dot product attention, reshape back to the original shape
         if not self.export_onnx_fused:
@@ -140,11 +146,17 @@ class PreLnSelfAttentionLayer(nn.Module):
         use_simplified_attention=False,
         export_onnx_fused=False,
         save_attention=False,
+        use_padding_mask=False,
     ):
         super(PreLnSelfAttentionLayer, self).__init__()
         self.name = name
 
         self.use_simplified_attention = use_simplified_attention
+
+        # without a padding mask, real elements also attend to the zero-padded elements of smaller events in the batch
+        self.use_padding_mask = use_padding_mask
+        if self.use_padding_mask and attention_type == "flash":
+            raise ValueError("flash attention does not support a padding mask, use attention_type: efficient or math")
 
         self.attention_type = attention_type
         self.act = get_activation(activation)
@@ -194,14 +206,18 @@ class PreLnSelfAttentionLayer(nn.Module):
         if mask is not None:
             q = q * mask_
 
+        key_padding_mask = None
+        if self.use_padding_mask and mask is not None:
+            key_padding_mask = ~mask.bool()
+
         if self.use_simplified_attention:
-            mha_out = self.mha(q, x_norm, x_norm, need_weights=False)[0]
+            mha_out = self.mha(q, x_norm, x_norm, need_weights=False, key_padding_mask=key_padding_mask)[0]
         else:
             with sdpa_kernel(self.attn_params[self.attention_type]):
-                mha_out = self.mha(q, x_norm, x_norm, need_weights=False)[0]
+                mha_out = self.mha(q, x_norm, x_norm, need_weights=False, key_padding_mask=key_padding_mask)[0]
 
                 if self.save_attention:
-                    att_mat = self.mha(q, x_norm, x_norm, need_weights=True)[1]
+                    att_mat = self.mha(q, x_norm, x_norm, need_weights=True, key_padding_mask=key_padding_mask)[1]
                     att_mat = att_mat.detach().cpu().numpy()
 
         x = residual + mha_out
@@ -209,6 +225,7 @@ class PreLnSelfAttentionLayer(nn.Module):
         x_norm = self.norm1(x)
         ffn_out = self.seq(x_norm)
         ffn_out = self.dropout(ffn_out)
+        x = residual + ffn_out
         if mask is not None:
             x = x * mask_
         if not self.use_simplified_attention and self.save_attention:
@@ -328,6 +345,7 @@ class MLPF(nn.Module):
         use_simplified_attention=False,
         export_onnx_fused=False,
         save_attention=False,
+        use_padding_mask=False,
     ):
         super(MLPF, self).__init__()
 
@@ -384,6 +402,7 @@ class MLPF(nn.Module):
                             use_simplified_attention=use_simplified_attention,
                             export_onnx_fused=export_onnx_fused,
                             save_attention=save_attention,
+                            use_padding_mask=use_padding_mask,
                         )
                     )
                     self.conv_reg.append(
@@ -401,6 +420,7 @@ class MLPF(nn.Module):
                             use_simplified_attention=use_simplified_attention,
                             export_onnx_fused=export_onnx_fused,
                             save_attention=save_attention,
+                            use_padding_mask=use_padding_mask,
                         )
                     )
             elif self.conv_type == "gnn_lsh":
